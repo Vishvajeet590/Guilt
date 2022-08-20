@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/home2">
+
+    <fragment
+        android:id="@+id/home2"
+        android:name="com.example.guilt.home"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_home2_to_map"
+            app:destination="@id/mpp_fragment"
+            app:popUpTo="@id/home2" />
+    </fragment>
+    <fragment
+        android:id="@+id/mpp_fragment"
+        android:name="com.example.guilt.map"
+        android:label="fragment_map"
+        tools:layout="@layout/fragment_map" >
+        <action
+            android:id="@+id/action_map_to_home2"
+            app:destination="@id/home2"
+            app:popUpTo="@id/home2" />
+        <argument
+            android:name="longitude"
+            app:argType="string" />
+        <argument
+            android:name="lattitude"
+            app:argType="string" />
+        <argument
+            android:name="app_name"
+            app:argType="string" />
+        <argument android:name="pacakge_name"
+            app:argType="string" />
+    </fragment>
+</navigation>
