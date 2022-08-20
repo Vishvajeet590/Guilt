@@ -14,7 +14,14 @@ Guilt is an inspiration from meta (pun intented), it tracks the apps usage and m
 - JetPack
   - Lifecycle - dispose observing data when lifecycle state changes.
   - ViewModel - UI related data holder, lifecycle aware.
+  - Room DB
 - Permisions
   - Location
   - UsageStat
   - Foreground Service
+  
+  
+## Basic overview
+- As the app starts it starts a foreground service. The service calls the usageStat api to fetch recent events, and feteches the location at that moment. 
+- Then service inserts that data in sql db (ROOM).
+- When the app is opened again, it fetches the latest entries from DB and shows it on the home.
