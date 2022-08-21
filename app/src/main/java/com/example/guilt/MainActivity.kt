@@ -45,8 +45,11 @@ class MainActivity : AppCompatActivity() {
         if (!isMyServiceRunning(GuiltService::class.java)) {
             startService(Intent(this, GuiltService::class.java))
             Log.d("SERVICE", "Service Started....")
-        } else
+        } else{
+            //stopService(Intent(this,GuiltService::class.java))
+            //startService(Intent(this, GuiltService::class.java))
             Log.d("SERVICE", "Service ia already running....")
+        }
 
     }
 

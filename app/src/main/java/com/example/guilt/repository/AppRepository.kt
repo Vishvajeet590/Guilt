@@ -27,6 +27,10 @@ class AppRepository(context: Context) {
         return db.getCount()
     }
 
+    suspend fun getTimStamp(appName: String?) :Long{
+        return db.getTimeStamp(appName)
+    }
+
 /*
 
     private class insertAsyncTask internal constructor(private val appDao: AppDao): AsyncTask<Apps,Void, Void>(){

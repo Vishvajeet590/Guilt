@@ -16,6 +16,7 @@ import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.example.guilt.repository.AppRepository
@@ -41,10 +42,10 @@ class GuiltService : Service() {
     override fun onCreate() {
         super.onCreate()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) showNotification() else startForeground(
-            1,
+/*        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) showNotification() else startForeground(
+            123,
             Notification()
-        )
+        )*/
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED
@@ -61,7 +62,9 @@ class GuiltService : Service() {
                 Looper.getMainLooper()
             )
         }
+
         createNotificationChannel()
+        showNotification()
     }
 
 
@@ -90,7 +93,9 @@ class GuiltService : Service() {
 
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startRepeatingJob(5000L)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startRepeatingJob(5000L)
+        }
         return START_STICKY
     }
 
@@ -158,6 +163,7 @@ class GuiltService : Service() {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun startRepeatingJob(timeInterval: Long): Job {
         val rep: AppRepository by lazy {
             AppRepository(this)
@@ -167,7 +173,6 @@ class GuiltService : Service() {
             while (NonCancellable.isActive) {
                 // add your task here
                 if (checkUsageStatsPermission()) {
-                    // Implement further app logic here ...
                     val packages =
                         packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
                     val allAppMap = HashMap<String, String>()
@@ -186,25 +191,22 @@ class GuiltService : Service() {
                     val usageStatsManager: UsageStatsManager =
                         getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
 
-
-                    val usageEvents =
-                        usageStatsManager.queryEvents(currentTime - (1000 * 60 * 10), currentTime)
-                    val usageEvent = UsageEvents.Event()
-                    while (usageEvents.hasNextEvent()) {
-                        usageEvents.getNextEvent(usageEvent)
-                        if (appMap.containsKey(usageEvent.packageName)) {
-                            if (allAppMap.containsKey(usageEvent.packageName) && !cleanAppLocationMap.containsKey(
-                                    allAppMap.get(usageEvent.packageName)
+                    val usageStats = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY,currentTime - (1000 * 60 * 10), currentTime)
+                    for (usageStat in usageStats) {
+                        //usageEvents.getNextEvent(usageEvent)
+                        if (appMap.containsKey(usageStat.packageName)) {
+                            if (allAppMap.containsKey(usageStat.packageName) && !cleanAppLocationMap.containsKey(
+                                    allAppMap.get(usageStat.packageName)
                                 )
                             ) {
 
-                                val appName = allAppMap.get(usageEvent.packageName)
-                                val packageName = usageEvent.packageName
+                                val appName = allAppMap.get(usageStat.packageName)
+                                val packageName = usageStat.packageName
 
 
                                 Log.e(
-                                    "APP",
-                                    "${allAppMap.get(usageEvent.packageName)} : ${longitude} -  ${latitude}"
+                                    "APP-MAP",
+                                    "${allAppMap.get(usageStat.packageName)} : ${longitude} -  ${latitude}"
                                 )
                                 cleanAppLocationMap.put(appName, locationStr)
                                 val app = appName?.let {
@@ -213,20 +215,41 @@ class GuiltService : Service() {
                                         packageName = packageName,
                                         latitude = latitude,
                                         longitude = longitude,
-                                        timeStamp = usageEvent.timeStamp
+                                        timeStamp = usageStat.lastTimeStamp
                                     )
                                 }
-                                if (app != null) {
-                                    rep.insertApp(app)
-                                }
-                                Log.d("DB", "${appName} : INSERTING DB")
 
+
+
+                                if(rep.isAppIsExist(appName)){
+
+                                    val appPreviousTimestamp = rep.getTimStamp(appName)
+                                    Log.d("UPDATEAPP", "${appName}  :  ${usageStat.lastTimeVisible} - ${appPreviousTimestamp} : ")
+
+                                    //   Log.d("UPDATEDB", "${usageEvent.timeStamp}  :  ${appPreviousTimestamp}")
+
+                                    if( usageStat.lastTimeVisible >0 && usageStat.lastTimeVisible != appPreviousTimestamp){
+                                        if (app != null) {
+                                            rep.updateApp(app)
+                                        }
+
+                                    }
+
+                                }else{
+                                    if (app != null) {
+                                        rep.insertApp(app)
+                                    }
+                                    Log.d("UPDATEDB", "${appName} : INSERTING row in DB")
+                                }
                             }
+
+
                         }
                     }
+                    cleanAppLocationMap.clear()
+
 
                 } else {
-                    // Navigate the user to the permission settings
                     Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS).apply {
                         startActivity(this)
                     }

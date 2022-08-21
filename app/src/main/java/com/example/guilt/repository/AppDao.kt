@@ -19,4 +19,6 @@ interface AppDao {
     @Query("SELECT count(*) FROM app_table")
     suspend fun getCount() : Int
 
+    @Query("SELECT timeStamp FROM APP_TABLE WHERE appName = :appName")
+    suspend fun getTimeStamp(appName: String?) : Long
 }
