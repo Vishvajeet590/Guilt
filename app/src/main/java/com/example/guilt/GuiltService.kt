@@ -96,6 +96,9 @@ class GuiltService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startRepeatingJob(5000L)
         }
+        else{
+            Log.d("TAG","Android q is needed")
+        }
         return START_STICKY
     }
 
