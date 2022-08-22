@@ -1,6 +1,6 @@
 <h1 align="center">Guilt</h1>
 <p align="center">  
-Guilt is an inspiration from meta (pun intented), it tracks the apps usage and maps it with geo locoation data where the app was last used. The app is built for 
+Guilt is an inspiration from Meta (pun intented), it tracks the apps usage and maps it with geo locoation data where the app was last used. The app is built to collect data points for users app usage behaviour at different locations.
 </p>
 
 <p align="center">
