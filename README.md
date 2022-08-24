@@ -1,6 +1,6 @@
 <h1 align="center">Guilt</h1>
 <p align="center">  
-Guilt is an inspiration from Meta (pun intented), it tracks the apps usage and maps it with geo locoation data where the app was last used. The app is built to collect data points for users app usage behaviour at different locations.
+Guilt is an inspiration from Meta (pun intended), it tracks the apps usage and maps it with geo location data where the app was last used. The app is built to collect data points for users app usage behaviour at different locations.
 </p>
 
 <p align="center">
@@ -22,6 +22,6 @@ Guilt is an inspiration from Meta (pun intented), it tracks the apps usage and m
   
   
 ## Basic overview
-- As the app starts it starts a foreground service. The service calls the usageStat api to fetch recent events, and feteches the location at that moment. 
+- As the app starts it starts a foreground service. The service calls the usageStat api to fetch recent events, and fetches the location at that moment. 
 - Then service inserts that data in sql db (ROOM).
-- When the app is opened again, it fetches the latest entries from DB and shows it on the home.
+- When the app is opened again, it fetches the latest entries from DB and shows them on the home.
